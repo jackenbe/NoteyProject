@@ -4,15 +4,23 @@ from django.contrib.auth.decorators import login_required
 from .form import RegistrationForm, GroupForm, JoinUniversityForm, GroupNoteCreationForm, PersonalNoteCreationForm
 from django.contrib.auth import login
 from .models import Profile, Group, Note
-
+import uuid
+from django.contrib import messages
 
 @login_required(login_url='/login')
 def home(request):
     context = {}
     if request.method =="POST":
         invite_code = request.POST.get('invite_code', ' ').strip()
+
         try:
-            group = Group.objects.get(invite_code=invite_code)
+            obj_code = uuid.UUID(invite_code)
+        except ValueError:
+            messages.error(request, "Invalid invite code.")
+            return redirect('/groups')
+
+        try:
+            group = Group.objects.get(invite_code=obj_code)
             profile = Profile.objects.get(user=request.user)
 
             if group in profile.groups.all() or (group.university not in profile.universities.all()):
@@ -20,8 +28,11 @@ def home(request):
             else:
                 profile.groups.add(group)
                 context['success'] = 'Successfully Joined Group'
+                return redirect('/groups')
         except Group.DoesNotExist:
             context['error'] = 'Group does not exist'
+            return redirect("/groups")
+
     return render(request, 'main/home.html', context)
 
 @login_required(login_url='/login')
@@ -44,8 +55,11 @@ def group_create(request):
 
 @login_required(login_url='/login')
 def group_list(request):
-    profile = Profile.objects.get(user=request.user)
-    groups = profile.groups.all()
+    try:
+        profile = Profile.objects.get(user=request.user)
+        groups = profile.groups.all()
+    except Profile.DoesNotExist:
+        raise Http404("Profile does not exist")
     context ={
         "groups": groups,
         "user": request.user
