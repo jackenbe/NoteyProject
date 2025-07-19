@@ -1,6 +1,4 @@
-from lib2to3.fixes.fix_input import context
 from django.http import Http404, HttpResponseForbidden
-from django.db.transaction import commit
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .form import RegistrationForm, GroupForm, JoinUniversityForm, GroupNoteCreationForm, PersonalNoteCreationForm
