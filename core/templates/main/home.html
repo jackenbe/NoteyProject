@@ -1,0 +1,22 @@
+{% extends 'main/base.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-center mt-4">
+    <div class="card p-4 shadow" style="width: 400px;">
+        <h4 class="mb-3 text-center">Join a Group with Invite Code</h4>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="text" class="form-control" name="invite_code" placeholder="Enter Invite Code" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mt-3">Join Group</button>
+        </form>
+        {% if error %}
+            <p class="text-danger mt-2 text-center">{{ error }}</p>
+        {% elif success %}
+            <p class="text-success mt-2 text-center">{{ success }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'main/base.html' %}
+{% block title %}Groups{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h2>Your Universities:</h2>
+    {% if universities %}
+        {% for University in universities %}
+            <div class="card mt-2">
+                <div class="card-body d-flex- flex-row justify-content-between"></div>
+                <div>
+                    <h1>{{ University.name }}</h1>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>You're not in a university yet</p>
+    {% endif %}
+    <p>Join a university:</p><br>
+    <form method="post"> {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success">Join</button>
+    </form>
+{% endblock %}

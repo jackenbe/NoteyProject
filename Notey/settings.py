@@ -21,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-you-can-change-later")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 #'django-insecure-$z0jt!u)yj$&pg$$m6_l&@!!pk*oj$g)9bkasbue+pc+tq@h95'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", 'False').lower() == "true" or True
+DEBUG = os.environ.get("DEBUG", 'false').lower() == "true"
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1").split(" ")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
 
 # Application definition
@@ -38,7 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "crispy_forms",
+    "crispy_bootstrap5",
+    "core",
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACK = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -80,7 +87,7 @@ DATABASES = {
     }
 }
 
-database_url = os.environ.get("DATABASE_URL", "postgresql://notey_data_user:dgqy2hlpFYOzRL1GrEZqvO2xMeg3uYB6@dpg-d1rv6aq4d50c73a43ru0-a.oregon-postgres.render.com/notey_data")
+database_url = os.environ.get("DATABASE_URL")
 DATABASES['default'] = dj_database_url.parse(database_url)
 
 
@@ -124,3 +131,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_REDIRECT_URL = '/home'
+LOGOUT_REDIRECT_URL = '/login'

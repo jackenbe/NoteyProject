@@ -1,0 +1,12 @@
+{% extends 'main/base.html' %}
+{% block title %}{{ group.name }}{% endblock %}
+{% block content %}
+    <h1>{{note.title}}</h1>
+    <p>{{ note.context }}</p>
+    {% if user == note.author %}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" name="note-id" value="{{ note.id }}">Delete</button>
+        </form>
+    {% endif %}
+{% endblock %}
