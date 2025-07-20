@@ -32,6 +32,9 @@ class Profile(models.Model):
     universities = models.ManyToManyField(University, blank=False)
     groups = models.ManyToManyField(Group, blank=True)
 
+    def __str__(self):
+        return self.user.username
+
 
 class Note(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -44,6 +47,9 @@ class Note(models.Model):
 
     def get_absolute_url(self):
         return reverse("Core:note_view", kwargs={"id": self.id})
+
+    def __str__(self):
+        return self.title
 
 
 class Comment(models.Model):

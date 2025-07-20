@@ -6,6 +6,7 @@ from django.contrib.auth import login
 from .models import Profile, Group, Note
 import uuid
 from django.contrib import messages
+import time
 
 @login_required(login_url='/login')
 def home(request):
@@ -23,16 +24,19 @@ def home(request):
             group = Group.objects.get(invite_code=obj_code)
             profile = Profile.objects.get(user=request.user)
 
-            if group in profile.groups.all() or (group.university not in profile.universities.all()):
+            if group in profile.groups.all():
                 context['error'] = "You're already in this group"
+            elif group.university not in profile.universities.all():
+                context['error'] = "You're not in the group's university"
             else:
                 profile.groups.add(group)
+                group.members.add(request.user)
                 context['success'] = 'Successfully Joined Group'
+                time.sleep(1)
                 return redirect('/groups')
         except Group.DoesNotExist:
             context['error'] = 'Group does not exist'
             return redirect("/groups")
-
     return render(request, 'main/home.html', context)
 
 @login_required(login_url='/login')
