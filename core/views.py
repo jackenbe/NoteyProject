@@ -1,14 +1,13 @@
 from django.http import Http404, HttpResponseForbidden
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.template.context_processors import request
-
 from .form import RegistrationForm, GroupForm, JoinUniversityForm, GroupNoteCreationForm, PersonalNoteCreationForm, CommentCreationForm
 from django.contrib.auth import login
 from .models import Profile, Group, Note, Comment
 import uuid
 from django.contrib import messages
 import time
+from django.views.generic import UpdateView
 
 @login_required(login_url='/login')
 def home(request):
@@ -153,7 +152,7 @@ def note_view(request, id):
                 return redirect(f'/group/{note.group.id}')
             else:
                 return redirect("/personal")
-        elif action == 'comment':
+        elif action == 'comment' and note.is_personal == False:
             form = CommentCreationForm(request.POST)
             if form.is_valid():
                 comment = form.save(commit=False)
@@ -163,7 +162,7 @@ def note_view(request, id):
                 context['comment_form'] = form
                 return redirect(f'/note/{note_id}')
 
-        elif action == "comment_delete":
+        elif action == "comment_delete" and note.is_personal == False:
             comment_id = request.POST.get('comment-id')
             try:
                 comment = Comment.objects.get(id=comment_id)
@@ -173,13 +172,13 @@ def note_view(request, id):
             if comment and (request.user == note.author or request.user == note.group.created_by or request.user == comment.author):
                 comment.delete()
                 return redirect(f'/note/{note_id}')
-        elif action == "up_vote":
+        elif action == "up_vote" and note.is_personal == False:
             if request.user not in note.Upvote.all():
                 note.Upvote.add(request.user)
                 note.Downvote.remove(request.user)
             else:
                 note.Upvote.remove(request.user)
-        elif action == "down_vote":
+        elif action == "down_vote" and note.is_personal == False:
             if request.user not in note.Downvote.all():
                 note.Downvote.add(request.user)
                 note.Upvote.remove(request.user)
@@ -193,6 +192,18 @@ def note_view(request, id):
     context['note'] = note
     context['user'] = request.user
     return render(request, "main/note_detail.html", context)
+
+class NoteUpdateView(UpdateView):
+    template_name = 'main/note_create.html'
+    form_class = PersonalNoteCreationForm
+
+    def get_object(self):
+        id_ = self.kwargs.get("id")
+        return get_object_or_404(Note, id=id_)
+
+    def form_valid(selfself, form):
+        print(form.cleaned_data)
+        return super().form_valid(form)
 
 @login_required(login_url='/login')
 def note_create(request, id):

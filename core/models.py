@@ -51,6 +51,9 @@ class Note(models.Model):
     def get_absolute_url(self):
         return reverse("Core:note_view", kwargs={"id": self.id})
 
+    def get_edit_url(self):
+        return reverse("Core:edit_view", kwargs={"id": self.id})
+
     def __str__(self):
         return self.title
 

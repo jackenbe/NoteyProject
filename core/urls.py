@@ -2,7 +2,7 @@ from tokenize import group
 
 from django.urls import path
 from .views import home
-from .views import sign_up, group_create, group_list, view_universities,group_view, note_view, note_create, personal_view, personal_note_create
+from .views import sign_up, group_create, group_list, view_universities,group_view, note_view, note_create, personal_view, personal_note_create, NoteUpdateView
 
 app_name = "Core"
 urlpatterns = [
@@ -16,5 +16,6 @@ urlpatterns = [
     path('note/<int:id>', note_view, name="note_view"),
     path('group/<int:id>/create/', note_create, name="note_create"),
     path('personal/', personal_view, name="personal_view"),
-    path('personal/create', personal_note_create, name='personal_note_create')
+    path('personal/create', personal_note_create, name='personal_note_create'),
+    path('note/<int:id>/edit/', NoteUpdateView.as_view(), name="edit_view")
 ]
