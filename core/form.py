@@ -1,7 +1,9 @@
+from cProfile import label
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import University, Group, Profile, Note
+from .models import University, Group, Profile, Note, Comment
 
 
 class RegistrationForm(UserCreationForm):
@@ -70,3 +72,12 @@ class PersonalNoteCreationForm(forms.ModelForm):
     class Meta:
         model = Note
         fields = ['title', 'context']
+
+class CommentCreationForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['context']
+
+        labels = {
+            'context': 'Comment'
+        }

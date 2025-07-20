@@ -21,7 +21,13 @@
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger" name="group-id" value="{{ group.id }}">Delete</button>
                             </form>
+                        {% else %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger" name="group-id" value="{{ group.id }}">Leave</button>
+                            </form>
                         {% endif %}
+
                     </div>
             </div>
 

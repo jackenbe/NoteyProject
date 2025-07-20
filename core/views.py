@@ -1,9 +1,11 @@
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .form import RegistrationForm, GroupForm, JoinUniversityForm, GroupNoteCreationForm, PersonalNoteCreationForm
+from django.template.context_processors import request
+
+from .form import RegistrationForm, GroupForm, JoinUniversityForm, GroupNoteCreationForm, PersonalNoteCreationForm, CommentCreationForm
 from django.contrib.auth import login
-from .models import Profile, Group, Note
+from .models import Profile, Group, Note, Comment
 import uuid
 from django.contrib import messages
 import time
@@ -18,6 +20,7 @@ def home(request):
             obj_code = uuid.UUID(invite_code)
         except ValueError:
             messages.error(request, "Invalid invite code.")
+            time.sleep(.5)
             return redirect('/groups')
 
         try:
@@ -73,6 +76,9 @@ def group_list(request):
         group = Group.objects.get(id=group_id)
         if group and request.user == group.created_by:
             group.delete()
+        else:
+            group.members.remove(request.user)
+            profile.groups.remove(group)
         return redirect('/home')
     return render(request, 'main/groups.html', context)
 
@@ -114,6 +120,7 @@ def group_view(request, id):
 
 @login_required(login_url='/login')
 def note_view(request, id):
+    context = {}
     try:
         note = Note.objects.get(id=id)
     except Note.DoesNotExist:
@@ -130,17 +137,61 @@ def note_view(request, id):
     if note.group and note.group not in profile.groups.all():
         return redirect('/home')
 
+
+    comments = Comment.objects.filter(note=note).order_by('-created_time')
+    context['comments'] = comments
+
     if request.method == "POST":
+        action = request.POST.get('action')
         note_id = request.POST.get('note-id')
         note = Note.objects.get(id=note_id)
-        if note and request.user == note.author:
-            note.delete()
-        return redirect('/home')
+        context['comment_form'] = CommentCreationForm()
+        if action == 'delete':
+            if note and (request.user == note.author or request.user == note.group.created_by):
+                note.delete()
+            if note.group:
+                return redirect(f'/group/{note.group.id}')
+            else:
+                return redirect("/personal")
+        elif action == 'comment':
+            form = CommentCreationForm(request.POST)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.author = request.user
+                comment.note = note
+                comment.save()
+                context['comment_form'] = form
+                return redirect(f'/note/{note_id}')
 
-    context = {
-        'note': note,
-        'user': request.user
-    }
+        elif action == "comment_delete":
+            comment_id = request.POST.get('comment-id')
+            try:
+                comment = Comment.objects.get(id=comment_id)
+            except Comment.DoesNotExist:
+                raise Http404("Comment does not exist")
+
+            if comment and (request.user == note.author or request.user == note.group.created_by or request.user == comment.author):
+                comment.delete()
+                return redirect(f'/note/{note_id}')
+        elif action == "up_vote":
+            if request.user not in note.Upvote.all():
+                note.Upvote.add(request.user)
+                note.Downvote.remove(request.user)
+            else:
+                note.Upvote.remove(request.user)
+        elif action == "down_vote":
+            if request.user not in note.Downvote.all():
+                note.Downvote.add(request.user)
+                note.Upvote.remove(request.user)
+            else:
+                note.Downvote.remove(request.user)
+
+    else:
+        form = CommentCreationForm()
+        context['comment_form'] = form
+
+    context['note'] = note
+    context['user'] = request.user
     return render(request, "main/note_detail.html", context)
 
 @login_required(login_url='/login')

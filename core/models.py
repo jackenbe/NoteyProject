@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 import uuid
 
+
 class University(models.Model):
     name = models.CharField(max_length=50)
 
@@ -44,6 +45,8 @@ class Note(models.Model):
     is_personal = models.BooleanField(default=False)
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
+    Upvote = models.ManyToManyField(User, related_name="Upvote")
+    Downvote = models.ManyToManyField(User, related_name="Downvote")
 
     def get_absolute_url(self):
         return reverse("Core:note_view", kwargs={"id": self.id})
@@ -51,10 +54,17 @@ class Note(models.Model):
     def __str__(self):
         return self.title
 
+    def vote_score(self):
+        return self.Upvote.count() - self.Downvote.count()
+
 
 class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     note = models.ForeignKey(Note, on_delete=models.CASCADE, null=True, blank=True)
-    context = models.TextField()
+    context = models.TextField(blank=False, null=False)
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.context
+
