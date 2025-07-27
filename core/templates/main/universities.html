@@ -2,22 +2,46 @@
 {% block title %}Universities{% endblock %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <h2>Your Universities:</h2>
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Your Universities</h2>
+
     {% if universities %}
-        {% for University in universities %}
-            <div class="card mt-2">
-                <div class="card-body d-flex- flex-row justify-content-between"></div>
-                <div>
-                    <h1>{{ University.name }}</h1>
+        <div class="row">
+            {% for University in universities %}
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body text-center">
+                            <h4 class="card-title text-primary">{{ University.name }}</h4>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     {% else %}
-        <p>You're not in a university yet</p>
+        <p class="text-center text-muted">You're not in a university yet.</p>
     {% endif %}
-    <p>Join a university:</p><br>
-    <form method="post"> {% csrf_token %}
-        {{ form|crispy }}
-        <button type="submit" class="btn btn-success">Join</button>
-    </form>
+
+    <div class="card mt-4 shadow-sm border-0">
+        <div class="card-body">
+            <h5 class="mb-3">Join a University:</h5>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.university|as_crispy_field }}
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        let uniField = document.getElementById("id_university");
+                        if (uniField && uniField.tagName === "SELECT") {
+                            uniField.options[0].text = "Select your university...";
+                        } else if (uniField) {
+                            uniField.placeholder = "Enter your university name";
+                        }
+                    });
+                </script>
+                <button type="submit" class="btn btn-success w-100 mt-2">Join</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

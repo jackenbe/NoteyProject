@@ -8,48 +8,47 @@
     <title>{% block title %}Notey{% endblock %}</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <nav class="container-fluid" >
-            <div>
-                <ul class="navbar-nav">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/home">Notey Notebook</a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a href="/home" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/universities" class="nav-link">Universities</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/groups" class="nav-link">Groups</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/personal" class="nav-link">Personal Notes</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <span class="navbar-text me-3">Welcome, <strong>{{ user.username }}</strong></span>
                     <li class="nav-item">
-                        <a href="/home" class="nav-link">Home</a>
+                        <form method="post" action="{% url 'logout' %}" class="d-inline"> {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                        </form>
                     </li>
+                {% else %}
                     <li class="nav-item">
-                        <a href="/universities" class="nav-link">Universities</a>
+                        <a href="/login" class="btn btn-outline-light btn-sm">Login</a>
                     </li>
-                    <li class="nav-item">
-                        <a href="/groups" class="nav-link">Groups</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/personal" class="nav-link">Personal Notes</a>
-                    </li>
-                </ul>
-            </div>
-            <div>
-
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                        <span class="navbar-text">{{ user.username }}</span>
-                        <li class="nav-item">
-                            <form method="post" action="{% url 'logout' %}"> {% csrf_token %}
-                                <button type="submit">Logout</button>
-                            </form>
-                        </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a href="/login">Login</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </nav>
+                {% endif %}
+            </ul>
+        </div>
     </nav>
 
-    <div class="container">
+    <div class="container bg-light p-4 rounded shadow-sm">
         {% block content %}
         {% endblock %}
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+    <footer class="text-center mt-5 py-3 bg-dark text-light">
+        <small>&copy; 2025 Notey Notebook - A collaborative note-sharing platform</small>
+    </footer>
 </body>
 </html>

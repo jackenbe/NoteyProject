@@ -2,38 +2,56 @@
 {% block title %}Groups{% endblock %}
 
 {% block content %}
-    <h2>Your Groups:</h2>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold">Your Groups</h2>
+        <a href="/group-create" class="btn btn-primary">+ Create New Group</a>
+    </div>
+
     {% if groups %}
-        {% for group in groups %}
-            <div class="card mt-2">
-                <div class="card-header"><strong>Owner: {{ group.created_by }}</strong></div>
-                <div class="card-body d-flex- flex-row justify-content-between">
-                    <div>
-                        <a href="{{ group.get_absolute_url }}"><h5>{{ group.name }}</h5></a>
-                        <p>
-                            Course: {{ group.course }}<br>
-                            University: {{ group.university }}<br>
-                            Invite code: {{ group.invite_code }}
-                        </p>
-                    </div>
-                        {% if user == group.created_by %}
-                            <form method="post">
+        <div class="row">
+            {% for group in groups %}
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-dark text-white">
+                            <strong>Owner:</strong> {{ group.created_by }}
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{{ group.get_absolute_url }}" class="text-decoration-none text-primary">
+                                    {{ group.name }}
+                                </a>
+                            </h5>
+                            <p class="mb-2">
+                                <span class="badge bg-info">Course: {{ group.course }}</span><br>
+                                <span class="badge bg-secondary mt-1">University: {{ group.university }}</span>
+                            </p>
+                            <p class="text-muted small mb-2">
+                                Invite Code: <code>{{ group.invite_code }}</code>
+                            </p>
+                        </div>
+                        <div class="card-footer bg-light text-end">
+                            <form method="post" class="d-inline">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger" name="group-id" value="{{ group.id }}">Delete</button>
+                                {% if user == group.created_by %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" name="group-id" value="{{ group.id }}">
+                                        Delete
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-outline-warning btn-sm" name="group-id" value="{{ group.id }}">
+                                        Leave
+                                    </button>
+                                {% endif %}
                             </form>
-                        {% else %}
-                            <form method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger" name="group-id" value="{{ group.id }}">Leave</button>
-                            </form>
-                        {% endif %}
-
+                        </div>
                     </div>
-            </div>
-
-        {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
     {% else %}
-        <p>You're not in a group yet</p>
+        <div class="alert alert-info text-center">
+            <p class="mb-0">You're not in a group yet. <a href="/group-create" class="alert-link">Create one here!</a></p>
+        </div>
     {% endif %}
-    <p>Want to create a group? Click <a href="/group-create">here!</a></p>
+</div>
 {% endblock %}

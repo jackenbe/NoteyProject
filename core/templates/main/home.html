@@ -2,21 +2,33 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <div class="d-flex justify-content-center mt-4">
-    <div class="card p-4 shadow" style="width: 400px;">
-        <h4 class="mb-3 text-center">Join a Group with Invite Code</h4>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg p-4" style="width: 450px; border-radius: 12px;">
+        <div class="text-center mb-3">
+            <h2 class="fw-bold text-primary">Welcome to Notey</h2>
+            <p class="text-muted">Collaborate and share notes with your peers</p>
+        </div>
+
+        <hr class="mb-3">
+
+        <h5 class="text-center mb-3">Join a Group</h5>
         <form method="post">
             {% csrf_token %}
-            <div class="form-group">
-                <input type="text" class="form-control" name="invite_code" placeholder="Enter Invite Code" required>
+            <div class="form-group mb-3">
+                <input type="text" class="form-control form-control-lg" name="invite_code" placeholder="🔑 Enter Invite Code" required>
             </div>
-            <button type="submit" class="btn btn-primary w-100 mt-3">Join Group</button>
+            <button type="submit" class="btn btn-primary w-100 btn-lg">Join Group</button>
         </form>
+
         {% if error %}
-            <p class="text-danger mt-2 text-center">{{ error }}</p>
+            <div class="alert alert-danger mt-3 text-center">{{ error }}</div>
         {% elif success %}
-            <p class="text-success mt-2 text-center">{{ success }}</p>
+            <div class="alert alert-success mt-3 text-center">{{ success }}</div>
         {% endif %}
+
+        <div class="mt-4 text-center">
+            <p class="text-muted">Don't have a group yet? <a href="/groups" class="fw-semibold">Create One</a></p>
+        </div>
     </div>
 </div>
 {% endblock %}
